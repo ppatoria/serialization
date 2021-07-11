@@ -76,8 +76,8 @@ int main(){
 
     auto envelope = deserialize(buf);
 
-    assert (msg_header   == envelope.msg_header );
-    assert (msg_body     == envelope.msg_body   );
+    assert (msg_header == envelope.msg_header );
+    assert (msg_body   == envelope.msg_body   );
 
     println (envelope.msg_header );
     println (envelope.msg_body   );
