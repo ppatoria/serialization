@@ -46,8 +46,9 @@ auto resize(buffer& buf, auto size){
 template<typename T>
 auto serialize (const T& data, buffer& buf)
 {  
-  auto initial_size/*before_resize*/ = resize(buf, sizeof(T));
-  std::memcpy(buf.data() + initial_size, &data, sizeof(T));
+  auto sizeofData = sizeof(T);
+  auto initial_size/*before_resize*/ = resize(buf, sizeofData);
+  std::memcpy(buf.data() + initial_size, &data, sizeofData);
 }
 
 struct envelope{ 
