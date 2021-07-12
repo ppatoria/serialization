@@ -14,13 +14,13 @@ using Bytes = std::vector<std::byte>;
 
 namespace safe{
     template<typename To, typename From> 
-    auto memcpy(std::vector<To>& dst, const From& src, const auto dst_start) noexcept 
+    auto memcpy(std::vector<To>& dst, const From& src, const auto dst_begin) noexcept 
     requires(   std::is_trivially_copyable_v<From>  &&
                 std::is_trivially_copyable_v<To[]> )
     {
-        if(dst.size() - dst_start == sizeof(From))
+        if(dst.size() - dst_begin == sizeof(From))
         {
-            std::memcpy(dst.data() + dst_start, &src, sizeof(From));
+            std::memcpy(dst.data() + dst_begin, &src, sizeof(From));
         }
     }
 }
