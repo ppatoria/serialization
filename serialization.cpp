@@ -10,7 +10,8 @@
      std::cout << content << std::endl;
  }
 
-using buffer = std::vector<std::byte>;
+using Bytes = std::vector<std::byte>;
+
 namespace safe{
     template<typename To, typename From> 
     auto memcpy(std::vector<To>& dst, const From& src, const auto dst_start) noexcept 
@@ -45,24 +46,25 @@ struct body{
     friend  std::ostream& operator << (std::ostream& os, const body& h);
     auto operator<=>(const body&) const = default;
 };
-std::ostream & operator << (std::ostream& os, const body& m){
+
+std::ostream & operator << (std::ostream& os, const body& b){
     return os   << "message: \n"
                 << "---------\n"
-                << "data: " << m.data << "\n";
+                << "data: " << b.data << "\n";
 }
 
-auto resize(buffer& buf, auto size){
-    auto initial_size = buf.size();
-    buf.resize(buf.size() + size);
-    return initial_size;
+template<size_t size>
+auto resizeBy(Bytes& buffer){
+    auto initial_size_before_resize = buffer.size();
+    buffer.resize(buffer.size() + size);
+    return initial_size_before_resize;
 }
 
-template<typename T>
-auto write (const T& data, buffer& buf)
+template<typename Data>
+auto write (const Data& data, Bytes& buffer)
 {  
-  auto sizeofData = sizeof(T);
-  auto buf_begin/*initial size before_resize*/ = resize(buf, sizeofData);
-  safe::memcpy(buf, data, buf_begin);
+  auto buffer_begin/*initial size before resize*/ = resizeBy<sizeof(Data)>(buffer);
+  safe::memcpy(buffer, data, buffer_begin);
 }
 
 struct envelope{ 
@@ -70,12 +72,12 @@ struct envelope{
     body   msg_body;
 };
 
-auto read(buffer& buf) -> envelope{
+auto read(Bytes& buffer) -> envelope{
     using namespace std;
     return envelope
     {
-        *bit_cast <header*> (buf.data()),
-        *bit_cast <body*>   (buf.data() + sizeof(header))
+        *bit_cast <header*> (buffer.data()),
+        *bit_cast <body*>   (buffer.data() + sizeof(header))
     };
 }
 
@@ -83,12 +85,12 @@ int main(){
     header  msg_header  {108, 'N', 21};
     body    msg_body    {63};
 
-    buffer buf;
+    Bytes buffer;
 
-    write (msg_header, buf);
-    write (msg_body,   buf);
+    write (msg_header, buffer);
+    write (msg_body,   buffer);
 
-    auto envelope = read(buf);
+    auto envelope = read(buffer);
 
     assert (msg_header == envelope.msg_header );
     assert (msg_body   == envelope.msg_body   );
