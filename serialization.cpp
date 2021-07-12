@@ -82,10 +82,6 @@ auto read(Bytes& buffer) -> envelope{
     };
 }
 
-struct B {
-    B(B const&) {}
-};
-
 int main(){
     header  msg_header  {108, 'N', 21};
     body    msg_body    {63};
