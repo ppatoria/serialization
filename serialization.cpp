@@ -13,17 +13,19 @@
 using Bytes = std::vector<std::byte>;
 
 namespace safe{
-    template<typename To, typename From> 
+
+    template<typename T> 
+    concept TriviallyCopyable = std::is_trivially_copyable_v<T>; 
+
+    template<TriviallyCopyable To, TriviallyCopyable From> 
     auto memcpy(std::vector<To>& dst, const From& src, const auto dst_begin)  
-    requires(   std::is_trivially_copyable_v<From>  &&
-                std::is_trivially_copyable_v<To[]> )
     {
         if(dst.size() - dst_begin != sizeof(From))
         {
             throw std::length_error("destination size is not equal to the source size.");
         }
         std::memcpy(dst.data() + dst_begin, &src, sizeof(From));
-    }
+    }    
 }
 
 struct header{
