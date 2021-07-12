@@ -20,7 +20,7 @@ namespace safe{
     {
         if(dst.size() - dst_begin != sizeof(From))
         {
-            throw std::length_error("destination size is not equal to the source size");
+            throw std::length_error("destination size is not equal to the source size.");
         }
         std::memcpy(dst.data() + dst_begin, &src, sizeof(From));
     }
