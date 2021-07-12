@@ -14,14 +14,15 @@ using Bytes = std::vector<std::byte>;
 
 namespace safe{
     template<typename To, typename From> 
-    auto memcpy(std::vector<To>& dst, const From& src, const auto dst_begin) noexcept 
+    auto memcpy(std::vector<To>& dst, const From& src, const auto dst_begin)  
     requires(   std::is_trivially_copyable_v<From>  &&
                 std::is_trivially_copyable_v<To[]> )
     {
-        if(dst.size() - dst_begin == sizeof(From))
+        if(dst.size() - dst_begin != sizeof(From))
         {
-            std::memcpy(dst.data() + dst_begin, &src, sizeof(From));
+            throw std::length_error("destination size is not equal to the source size");
         }
+        std::memcpy(dst.data() + dst_begin, &src, sizeof(From));
     }
 }
 
@@ -81,6 +82,10 @@ auto read(Bytes& buffer) -> envelope{
     };
 }
 
+struct B {
+    B(B const&) {}
+};
+
 int main(){
     header  msg_header  {108, 'N', 21};
     body    msg_body    {63};
@@ -97,6 +102,6 @@ int main(){
 
     println (envelope.msg_header );
     println (envelope.msg_body   );
-
+  
     return 0;
 }
